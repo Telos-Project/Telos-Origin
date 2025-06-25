@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://cdn.jsdelivr.net/gh/Telos-Project/AutoCORS/Code/autoCORS.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/Telos-Project/Use-JS/Code/Frontend/use.js"></script>
+	<script>
+
+		let url = window.location.href;
+		let urlArguments = { };
+
+		url.replace(
+			/[?&]+([^=&]+)=([^&]*)/gi,
+			function(m, key, value) {
+
+				urlArguments[decodeURIComponent(key)] =
+					decodeURIComponent(value);
+			}
+		);
+
+		autoCORS.applyDefault();
+
+		let apint = use("https://raw.githubusercontent.com/Telos-Project/APInt/refs/heads/main/Code/apintUtils.js");
+		let busNet = use("https://raw.githubusercontent.com/Telos-Project/Bus-Net/refs/heads/main/Code/JS/busNetUtils.js");
+
+		let package = use(urlArguments["apint"]);
+
+		apint.queryUtilities(
+			package, alias, { type: "bus-module" }
+		).forEach(item => {
+			busNet.connect(busNet.anchor, item, null, true);
+		});
+
+		busNet.call(JSON.stringify({
+			tags: ["telos-origin", "initialize"], content: urlArguments
+		}));
+
+	</script>
+</head>
+<body>
+
+</body>
