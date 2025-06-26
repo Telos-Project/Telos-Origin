@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 require("telos-use-js");
 
 var apint = use("apint");
