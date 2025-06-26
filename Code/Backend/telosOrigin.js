@@ -34,7 +34,7 @@ if(process.argv[2] == "-m") {
 
 			let alias = item;
 
-			if(alias.startsWith("http://") || alias.startsWith("http://")) {
+			if(alias.includes("/")) {
 
 				alias = alias.substring(alias.lastIndexOf("/") + 1);
 
@@ -42,13 +42,16 @@ if(process.argv[2] == "-m") {
 					alias = alias.substring(0, alias.lastIndexOf("."));
 			}
 
-			package[alias] = item;
+			package.packages[alias] = item;
 			package = apint.buildAPInt(package);
 
 			apint.queryUtilities(
 				package, alias, { type: "script-install" }
 			).forEach(script => {
-				script.forEach(command => child_process.execSync(command));
+
+				script.properties.script.forEach(
+					command => child_process.execSync(command)
+				);
 			});
 		});
 	}
@@ -60,10 +63,13 @@ if(process.argv[2] == "-m") {
 			apint.queryUtilities(
 				package, item, { type: "script-uninstall" }
 			).forEach(script => {
-				script.forEach(command => child_process.execSync(command));
+
+				script.properties.script.forEach(
+					command => child_process.execSync(command)
+				);
 			});
 
-			delete package[item];
+			delete package.packages[item];
 		});
 	}
 
@@ -77,9 +83,16 @@ if(process.argv[2] == "-m") {
 if(process.argv[2] == "-e") {
 
 	apint.queryUtilities(
-		package, alias, { type: "bus-module" }
+		package, null, { type: "bus-module" }
 	).forEach(item => {
-		busNet.connect(busNet.anchor, item, null, true);
+
+		let busModules = use(
+			Array.isArray(item.source) ? item.source[0] : item.source
+		);
+
+		(Array.isArray(busModules) ? busModules : [busModules]).forEach(
+			busModule => busNet.connect(busNet.anchor, busModule, null, true)
+		);
 	});
 
 	busNet.call(JSON.stringify({
