@@ -82,7 +82,30 @@ if(process.argv[2] == "-m") {
 		console.log(Object.keys(package.packages).join("\n"));
 }
 
-if(process.argv[2] == "-e") {
+if(process.argv.includes("-e")) {
+
+	let i = 2;
+	 
+	for(; i < process.argv.length; i++) {
+		
+		if(process.argv[i] == "-e")
+			break;
+
+		let alias = process.argv[i];
+
+		if(alias.includes("/")) {
+
+			alias = alias.substring(alias.lastIndexOf("/") + 1);
+
+			if(alias.indexOf(".") != -1)
+				alias = alias.substring(0, alias.lastIndexOf("."));
+		}
+
+		package.packages[alias] = process.argv[i];
+	}
+	
+	if(i > 2)
+		package = apint.buildAPInt(package);
 
 	apint.queryUtilities(
 		package, null, { type: "bus-module" }
@@ -98,6 +121,10 @@ if(process.argv[2] == "-e") {
 	});
 
 	busNet.call(JSON.stringify({
-		tags: ["telos-origin", "initialize"], content: process.argv.slice(3)
+		content: {
+			APInt: package,
+			arguments: process.argv.slice(i + 1)
+		},
+		tags: ["telos-origin", "initialize"]
 	}));
 }
