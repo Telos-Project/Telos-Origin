@@ -22,13 +22,18 @@ catch(error) {
 	fs.writeFileSync(packagePath, JSON.stringify(package, null, "\t"));
 }
 
-if(process.argv[2] == "-m") {
+let args = [].concat(process.argv);
+
+if(!args.includes("-m") && !args.includes("-e"))
+	args.push("-e");
+
+if(args[2] == "-m") {
 
 	if(package.packages == null)
 		package.packages = { };
 
-	let operation = process.argv[3];
-	let items = process.argv.slice(4);
+	let operation = args[3];
+	let items = args.slice(4);
 
 	if(operation == "install") {
 
@@ -82,16 +87,16 @@ if(process.argv[2] == "-m") {
 		console.log(Object.keys(package.packages).join("\n"));
 }
 
-if(process.argv.includes("-e")) {
+else if(args.includes("-e")) {
 
 	let i = 2;
 	 
-	for(; i < process.argv.length; i++) {
+	for(; i < args.length; i++) {
 		
-		if(process.argv[i] == "-e")
+		if(args[i] == "-e")
 			break;
 
-		let alias = process.argv[i];
+		let alias = args[i];
 
 		if(alias.includes("/")) {
 
@@ -101,7 +106,7 @@ if(process.argv.includes("-e")) {
 				alias = alias.substring(0, alias.lastIndexOf("."));
 		}
 
-		package.packages[alias] = process.argv[i];
+		package.packages[alias] = args[i];
 	}
 	
 	if(i > 2)
@@ -121,10 +126,7 @@ if(process.argv.includes("-e")) {
 	});
 
 	busNet.call(JSON.stringify({
-		content: {
-			APInt: package,
-			arguments: process.argv.slice(i + 1)
-		},
+		content: { APInt: package, arguments: args.slice(i + 1) },
 		tags: ["telos-origin", "initialize"]
 	}));
 }
