@@ -99,6 +99,52 @@ if(args[2] == "-m") {
 
 	if(operation == "list")
 		console.log(Object.keys(package.packages).join("\n"));
+
+	if(operation == "wrap") {
+
+		try {
+
+			let packagePath = `${process.cwd()}${path.sep}package.json`;
+			let ignorePath = `${process.cwd()}${path.sep}.gitignore`;
+			let telosPath = `${process.cwd()}${path.sep}telosOrigin.js`;
+
+			let packageJSON = { };
+
+			if(fs.existsSync(packagePath)) {
+
+				packageJSON = JSON.parse(
+					fs.readFileSync(packagePath, "utf-8")
+				);
+			}
+
+			packageJSON.scripts =
+				packageJSON.scripts != null ? packageJSON.scripts : { };
+
+			packageJSON.scripts.start = "npm telosOrigin.js";
+
+			if(!fs.existsSync(ignorePath)) {
+
+				fs.writeFileSync(
+					ignorePath, "node_modules/\npackage-lock.json"
+				);
+			}
+
+			fs.writeFileSync(
+				packagePath, JSON.stringify(packageJSON, null, "\t")
+			);
+
+			if(!fs.existsSync(telosPath)) {
+
+				fs.writeFileSync(
+					telosPath, fs.readFileSync(__filename, 'utf8')
+				);
+			}
+		}
+
+		catch(error) {
+			
+		}
+	}
 }
 
 else if(args.includes("-e")) {
