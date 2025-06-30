@@ -120,6 +120,7 @@ if(args[2] == "-m") {
 			packageJSON.scripts =
 				packageJSON.scripts != null ? packageJSON.scripts : { };
 
+			packageJSON.main = "telosOrigin.js";
 			packageJSON.scripts.start = "npm telosOrigin.js";
 
 			if(!fs.existsSync(ignorePath)) {
