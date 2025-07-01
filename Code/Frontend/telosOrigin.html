@@ -4,6 +4,8 @@
 	<script src="https://cdn.jsdelivr.net/gh/Telos-Project/Use-JS/Code/Frontend/use.js"></script>
 	<script>
 
+		autoCORS.applyDefault();
+
 		let url = window.location.href;
 		let urlArguments = { };
 
@@ -16,12 +18,19 @@
 			}
 		);
 
-		autoCORS.applyDefault();
+		let apint = use(
+			"https://raw.githubusercontent.com/Telos-Project/APInt/refs/heads/main/Code/apintUtils.js"
+		);
 
-		let apint = use("https://raw.githubusercontent.com/Telos-Project/APInt/refs/heads/main/Code/apintUtils.js");
-		let busNet = use("https://raw.githubusercontent.com/Telos-Project/Bus-Net/refs/heads/main/Code/JS/busNetUtils.js");
+		let busNet = use(
+			"https://raw.githubusercontent.com/Telos-Project/Bus-Net/refs/heads/main/Code/JS/busNetUtils.js"
+		);
 
 		let package = use(urlArguments["apint"]);
+
+		apint.queryUtilities(
+			package, null, { type: "telos-config" }
+		).forEach(item => Object.assign(urlArguments, item.properties));
 
 		apint.queryUtilities(
 			package, alias, { type: "bus-module" }
@@ -30,7 +39,11 @@
 		});
 
 		busNet.call(JSON.stringify({
-			tags: ["telos-origin", "initialize"], content: urlArguments
+			content: {
+				APInt: package,
+				options: { args: [], options: urlArguments }
+			},
+			tags: ["telos-origin", "initialize"]
 		}));
 
 	</script>
