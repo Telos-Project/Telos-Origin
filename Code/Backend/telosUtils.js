@@ -6,19 +6,26 @@ function create(onStart, onUpdate) {
 	return {
 		query: (packet) => {
 
-			if(!validatePacket(packet))
-				return;
+			try {
 
-			packet = JSON.parse(packet);
+				if(!validatePacket(packet))
+					return;
 
-			if(validatePacket(packet, ["telos-origin", "initialize"])) {
+				packet = JSON.parse(packet);
 
-				if(onStart != null)
-					onStart(packet.content);
+				if(validatePacket(packet, ["telos-origin", "initialize"])) {
+
+					if(onStart != null)
+						onStart(packet.content);
+				}
+
+				else if(onUpdate != null)
+					onUpdate(packet);
 			}
+			
+			catch(error) {
 
-			else if(onUpdate != null)
-				onUpdate(packet);
+			}
 		}
 	};
 }
@@ -45,36 +52,43 @@ function createEngine() {
 	return {
 		query: (packet) => {
 
-			if(!validatePacket(packet))
-				return;
+			try {
 
-			packet = JSON.parse(packet);
+				if(!validatePacket(packet))
+					return;
 
-			if(validatePacket(packet, ["telos-origin", "initialize"])) {
+				packet = JSON.parse(packet);
 
-				packetRecord = packet.content;
+				if(validatePacket(packet, ["telos-origin", "initialize"])) {
 
-				argsRecord = getArguments(packet.content);
+					packetRecord = packet.content;
+
+					argsRecord = getArguments(packet.content);
+				}
+
+				else if(validatePacket(packet, ["telos-engine-initiate"])) {
+
+					setInterval(
+						() => {
+
+							busNet.call(
+								JSON.stringify({ tags: ["telos-engine"] })
+							);
+						},
+						1000 / (
+							argsRecord?.options["engine-interval"] != null ?
+								argsRecord.options["engine-interval"] : 60
+						)
+					);
+				}
+
+				else if(validatePacket(packet, ["telos-engine-configuration"]))
+					return packetRecord;
 			}
 
-			else if(validatePacket(packet, ["telos-engine-initiate"])) {
-
-				setInterval(
-					() => {
-
-						busNet.call(
-							JSON.stringify({ tags: ["telos-engine"] })
-						);
-					},
-					1000 / (
-						argsRecord?.options["engine-interval"] != null ?
-							argsRecord.options["engine-interval"] : 60
-					)
-				);
+			catch(error) {
+				
 			}
-
-			else if(validatePacket(packet, ["telos-engine-configuration"]))
-				return packetRecord;
 		}
 	}
 }
