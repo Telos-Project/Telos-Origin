@@ -1,0 +1,16 @@
+{
+	"utilities": {
+		"telos-folder": {
+			"content": "telos",
+			"properties": {
+				"tags": ["telos-folder"]
+			}
+		},
+		"telos-defaults": {
+			"source": "telos-origin/telosDefaults.js",
+			"properties": {
+				"tags": ["telos-module"]
+			}
+		}
+	}
+}
