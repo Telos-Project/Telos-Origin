@@ -82,7 +82,7 @@ function createEngine() {
 					);
 				}
 
-				else if(validatePacket(packet, ["telos-engine-configuration"]))
+				else if(validatePacket(packet, ["telos-configuration"]))
 					return packetRecord;
 			}
 
@@ -93,7 +93,7 @@ function createEngine() {
 	}
 }
 
-function createTask(rate, callback) {
+function createTask(rate, auto, callback) {
 
 	let packageRecord = null;
 	let delta = null;
@@ -103,7 +103,8 @@ function createTask(rate, callback) {
 
 			packageRecord = package;
 
-			busNet.call(JSON.stringify({ tags: ["telos-engine-initiate"] }));
+			if(auto)
+				initiateEngine();
 		},
 		(packet) => {
 
@@ -124,7 +125,16 @@ function createTask(rate, callback) {
 	);
 }
 
+function getAPInt() {
+
+	return busNet.call(
+		JSON.stringify({ tags: ["telos-configuration"] })
+	)[0];
+}
+
 function getArguments(package) {
+
+	package = package != null ? package : getAPInt();
 
 	let options = apint.queryUtilities(
 		package,
@@ -139,6 +149,13 @@ function getArguments(package) {
 		arguments: options.arguments.slice(1),
 		options: options.options
 	};
+}
+
+function initiateEngine() {
+
+	busNet.call(
+		JSON.stringify({ tags: ["telos-engine-initiate"] })
+	);
 }
 
 function validatePacket(packet, tags) {
@@ -166,6 +183,8 @@ module.exports = {
 	createCommand,
 	createEngine,
 	createTask,
+	getAPInt,
 	getArguments,
+	initiateEngine,
 	validatePacket
 };
