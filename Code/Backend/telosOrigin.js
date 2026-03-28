@@ -1,5 +1,21 @@
 #!/usr/bin/env node
 
+function getLocalPackages(projectPath = process.cwd()) {
+
+	let pkgPath = require("path").join(projectPath, "package.json");
+
+	return !require("fs").existsSync(pkgPath) ?
+		[] :
+		Object.keys(
+			JSON.parse(
+				require("fs").readFileSync(pkgPath, "utf-8")
+			).dependencies
+		);
+}
+
+if(!getLocalPackages().includes("telos-origin"))
+	require("child_process").execSync("npm install telos-origin");
+
 require("telos-use-js");
 
 var apint = use("apint");
