@@ -160,6 +160,9 @@ argument sans said hyphen shall be assigned as a key to the options object, with
 argument as the value mapped to said key. The first argument following the -e flag shall be called
 the operation argument, and each successive argument shall be called a configuration argument.
 
+All fields of the options object shall be copied to the process.env object, and, if a .env file is
+present, Telos Origin shall also automatically load its contents into the process.env object.
+
 #### 2.2.1.2 - Frontend
 
 The frontend implementation of Telos Origin is available at the following link via

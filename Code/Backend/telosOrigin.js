@@ -18,6 +18,8 @@ if(!getLocalPackages().includes("telos-origin"))
 
 require("telos-use-js");
 
+use("dotenv").config();
+
 var apint = use("apint");
 var busNet = use("bus-net");
 var fs = use("fs");
@@ -175,6 +177,8 @@ options.arguments.forEach((item, index) => {
 getByType(package, "telos-argument").forEach(item => {
 	Object.assign(options.options, item.properties.options);
 });
+
+Object.assign(process.env, options.options);
 
 package.utilities["telos-arguments"] = {
 	properties: {
